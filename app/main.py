@@ -19,6 +19,8 @@ def create_tables():  # new
     Locality.metadata.create_all(bind=engine)
     Province.metadata.create_all(bind=engine)
 
+from fastapi.responses import FileResponse
+import json
 
 def start_application():
     app = FastAPI(title=settings.PROJECT_NAME,
@@ -41,11 +43,49 @@ def return_api():
     return {"Hello": "api"}
 
 
+def getTypeCat(str : str):
+    obj = ''.join(reversed(str)).split('|')
+    return ''.join(reversed(obj[0]))
+
+def getProvinciaCat(str :str):
+    if(str.startswith('43')):
+        return 'Tarragona'
+    elif str.startswith('08'):
+        return 'Barcelona'
+    elif str.startswith('17'):
+        return 'Girona'
+    elif str.startswith('25'):
+        return 'Lleida'
+    else : return 'Provincia Random'
+
 @app.get("/cat")
 def return_api():
-    with open(catPath, 'r') as file:
-        return xml_to_json(file.read())
-
+    with open(catPath, 'r',encoding='utf-8') as file:
+        obj = xml_to_json(file.read())
+        rows = obj['response']['row']
+        res = []
+        for lib in rows:
+            res.append({
+                'nombre': lib['nom'],
+                'description': lib['alies'],
+                'codigoPostal': lib['cpostal'],
+                'longitud': lib['longitud'],
+                'latitud': lib['latitud'],
+                'tipo': getTypeCat(str(lib['propietats'])),
+                'direccion': lib['via'],
+                'email': lib['email'],
+                # 'web': lib['weburl'],
+                'localidad': {
+                        'nombre': lib['poblacio'],
+                        'codigo': lib['codi_municipi']
+                },
+                'provincia': {
+                    'nombre': getProvinciaCat(lib['cpostal']),
+                    'codigo': str(lib['cpostal'])[0:2]
+                }
+            })
+        return res    
+       
 
 @app.get("/eus")
 def return_api():
@@ -119,6 +159,28 @@ def return_api():
             })
     return data
 
+@app.get("/catalunya")
+def return_catalunya():
+    return FileResponse("../assets/JSONcatalunya.json")
+
+@app.get("/catalunya/{prop}")
+def return_catalunya(prop:str, q: Optional[str] = None):
+    data = json.load(open("../assets/JSONcatalunya.json",'r',encoding='utf8'))
+    rows = data['response']['row']
+    list = []
+    if(q is None):
+        for i in rows:
+            list.append(i[prop])
+        return list
+    else:
+        for i in rows:
+            if(len(q)>0):
+                if(i[prop]==q):
+                    list.append(i)
+    return {
+        'numResultados': len(list),
+        'biblios': list
+    }        
 
 @app.get("/items/{item_id}")
 def read_item(item_id: int, q: Optional[str] = None):

@@ -25,8 +25,7 @@ valPath = os.path.join(os.path.dirname(__file__), "../static/valenciana.csv")
 
 
 def xml_to_json(input):
-    obj = xmltodict.parse(input)
-    return json.dumps(obj)
+    return xmltodict.parse(input,process_namespaces=True)
 
 
 def csv_to_json(csvFile):
