@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <response>
-<row>
 <row _id="row-c3jv.nr8i-we7s" _uuid="00000000-0000-0000-E76C-2964F0695BFC" _position="0" _address="https://analisi.transparenciacatalunya.cat/resource/zzzz-zzzz/row-c3jv.nr8i-we7s">
 <idequipament>10627897</idequipament>
 <alies>
@@ -45062,6 +45061,5 @@ Accés|Lliure|Especialitats|Art i disseny,Disseny|Horari d'estiu|DL de 10:00 a 1
 Accés|Lliure|Horari d'estiu|DL de 09:00 a 13:00<br/>DM de 09:00 a 13:00<br/>DX de 09:00 a 13:00<br/>DJ de 09:00 a 13:00<br/>DV de 09:00 a 13:00<br/>DS Tancat<br/>DG Tancat|Horari d'hivern|DL de 16:00 a 19:00<br/>DM de 09:00 a 13:00 i de 16:00 a 19:00<br/>DX de 16:00 a 19:00<br/>DJ de 09:00 a 13:00 i de 16:00 a 19:00<br/>DV de 16:00 a 19:00<br/>DS Tancat<br/>DG Tancat|Observacions|Ubicada al Local Social de Quart|Observacions horari estiu|Agost tancat|Període|Juliol|Serveis|Consulta a sala,Accés a Internet,Activitats de promoció de la biblioteca i foment de la lectura,Reserva de préstec,Préstec personal,Préstec interbibliotecari,Préstec de llibres electrònics|Titularitat|Adm. local: ajuntament
 </propietats>
 <localitzacio>POINT (2.8375516 41.93872)</localitzacio>
-</row>
 </row>
 </response>

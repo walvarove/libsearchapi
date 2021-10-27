@@ -1,2 +1,13 @@
 jinja2
 aiofiles    
+xmltodict
+pandas
+s3fs 
+fsspec
+
+#for database
+sqlalchemy
+psycopg2
+
+#for loading environment variables
+python-dotenv
