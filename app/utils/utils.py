@@ -1,3 +1,6 @@
+import xmltodict
+
+
 def flatten_list(_2d_list):
     flat_list = []
     # Iterate through the outer list
@@ -9,3 +12,7 @@ def flatten_list(_2d_list):
         else:
             flat_list.append(element)
     return flat_list
+
+
+def xml_to_json(input):
+    return xmltodict.parse(input, process_namespaces=True)
