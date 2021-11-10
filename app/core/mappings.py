@@ -4,7 +4,8 @@ import json
 import csv
 import pandas as pd
 
-all_libs: Final = ['cat','val','eus']
+all_libs: Final = ['cat', 'val', 'eus']
+
 
 def get_type_cat(str: str):
     obj = ''.join(reversed(str)).split('|')
@@ -21,82 +22,80 @@ def get_provincia_cat(str: str):
     elif str.startswith('25'):
         return 'Lleida'
     else:
-        return 'Provincia Random'
+        return 'Unknown Province'
 
 
-
-def get_catalunya_library(lib):
+def map_catalunya_library(lib):
     return {
-        'nombre': lib['nom'],
+        'name': lib['nom'],
         'description': lib['alies'],
-        'codigoPostal': lib['cpostal'],
-        'longitud': lib['longitud'],
-        'latitud': lib['latitud'],
-        'tipo': get_type_cat(str(lib['propietats'])),
-        'direccion': lib['via'],
+        'postalCode': lib['cpostal'],
+        'longitude': lib['longitud'],
+        'latitude': lib['latitud'],
+        'type': get_type_cat(str(lib['propietats'])),
+        'direction': lib['via'],
         'email': lib['email'],
         # 'web': lib['weburl'],
-        'localidad': {
-            'nombre': lib['poblacio'],
-            'codigo': lib['codi_municipi']
+        'locality': {
+            'name': lib['poblacio'],
+            'code': lib['codi_municipi']
         },
-        'provincia': {
-            'nombre': get_provincia_cat(lib['cpostal']),
-            'codigo': str(lib['cpostal'])[0:2]
+        'province': {
+            'name': get_provincia_cat(lib['cpostal']),
+            'code': str(lib['cpostal'])[0:2]
         }
     }
 
 
-def get_euskadi_library(lib):
+def map_euskadi_library(lib):
+    postalCode = lib['postalcode'].replace('.', '')
     return {
-        'nombre': lib['documentName'],
+        'name': lib['documentName'],
         'description': lib['documentDescription'],
-        'codigoPostal': lib['postalcode'].replace('.', ''),
-        'longitud': lib['latwgs84'],
-        'latitud': lib['lonwgs84'],
-        'tipo': 'PU',
-                'direccion': lib['address'],
-                'email': lib['email'],
-                'web': lib['webpage'],
-                'localidad': {
-            'nombre': lib['municipality'],
-            'codigo': lib['municipalitycode']
+        'postalCode': postalCode,
+        'longitude': lib['latwgs84'],
+        'latitude': lib['lonwgs84'],
+        'type': 'PU',
+        'direccion': lib['address'],
+        'email': lib['email'],
+        'web': lib['webpage'],
+        'locality': {
+            'name': lib['municipality'],
+            'code': postalCode[2:]
         },
-        'provincia': {
-                    'nombre': lib['territory'],
-                    'codigo': lib['territorycode']
+        'province': {
+            'name': lib['territory'],
+            'code': postalCode[:2]
         }
     }
 
 
-def get_valencian_library(lib, elems):
-    iNombre = elems.index('NOMBRE')
+def map_valencian_library(lib, elems):
+    iName = elems.index('NOMBRE')
     iDescription = elems.index('TIPO')
-    iDireccion = elems.index('DIRECCION')
-    iCodigoPostal = elems.index('CP')
-    iTipo = elems.index('COD_CARACTER')
+    iDirection = elems.index('DIRECCION')
+    iPostalCode = elems.index('CP')
+    iType = elems.index('COD_CARACTER')
     iEmail = elems.index('EMAIL')
     iWeb = elems.index('WEB')
-    iNombreMunicipio = elems.index('NOM_MUNICIPIO')
-    iCodMunicipio = elems.index('COD_MUNICIPIO')
-    iNombreProvincia = elems.index('NOM_PROVINCIA')
-    iCodProvincia = elems.index('COD_PROVINCIA')
+    iLocalityName = elems.index('NOM_MUNICIPIO')
+    iLocalityCode = elems.index('COD_MUNICIPIO')
+    iProvinceName = elems.index('NOM_PROVINCIA')
+    iProvinceCode = elems.index('COD_PROVINCIA')
     return {
-        'nombre': lib[iNombre],
+        'name': lib[iName],
         'description': lib[iDescription],
-        'codigoPostal': lib[iCodigoPostal],
-        'tipo': lib[iTipo],
-        'direccion': lib[iDireccion],
+        'postalCode': lib[iPostalCode],
+        'type': lib[iType],
+        'direction': lib[iDirection],
         'email': lib[iEmail],
         'web': lib[iWeb],
-        'localidad': {
-            'nombre': lib[iNombreMunicipio],
-            'codigo': lib[iCodMunicipio]
+        'locality': {
+            'name': lib[iLocalityName].lower().title(),
+            'code': lib[iLocalityCode]
         },
-        'provincia': {
-            'nombre': lib[iNombreProvincia],
-            'codigo': lib[iCodProvincia]
+        'province': {
+            'name': lib[iProvinceName].lower().title(),
+            'code': lib[iProvinceCode]
         }
     }
-
-
