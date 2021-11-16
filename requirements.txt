@@ -4,6 +4,7 @@ xmltodict
 pandas
 s3fs 
 fsspec
+pydantic
 
 #for database
 sqlalchemy

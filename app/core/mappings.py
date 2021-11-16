@@ -33,8 +33,9 @@ def map_catalunya_library(lib):
         'longitude': lib['longitud'],
         'latitude': lib['latitud'],
         'type': get_type_cat(str(lib['propietats'])),
-        'direction': lib['via'],
+        'address': lib['via'],
         'email': lib['email'],
+        'phoneNumber': lib['telefon1'] if 'telefon1' in lib else None,
         # 'web': lib['weburl'],
         'locality': {
             'name': lib['poblacio'],
@@ -59,6 +60,7 @@ def map_euskadi_library(lib):
         'direccion': lib['address'],
         'email': lib['email'],
         'web': lib['webpage'],
+        'phoneNumber':lib['phone'],
         'locality': {
             'name': lib['municipality'],
             'code': postalCode[2:]
@@ -73,11 +75,12 @@ def map_euskadi_library(lib):
 def map_valencian_library(lib, elems):
     iName = elems.index('NOMBRE')
     iDescription = elems.index('TIPO')
-    iDirection = elems.index('DIRECCION')
+    iAddress = elems.index('DIRECCION')
     iPostalCode = elems.index('CP')
     iType = elems.index('COD_CARACTER')
     iEmail = elems.index('EMAIL')
     iWeb = elems.index('WEB')
+    iPhoneNumber = elems.index('TELEFONO')
     iLocalityName = elems.index('NOM_MUNICIPIO')
     iLocalityCode = elems.index('COD_MUNICIPIO')
     iProvinceName = elems.index('NOM_PROVINCIA')
@@ -87,9 +90,10 @@ def map_valencian_library(lib, elems):
         'description': lib[iDescription],
         'postalCode': lib[iPostalCode],
         'type': lib[iType],
-        'direction': lib[iDirection],
+        'address': lib[iAddress],
         'email': lib[iEmail],
         'web': lib[iWeb],
+        'phoneNumber':lib[iPhoneNumber][5:],
         'locality': {
             'name': lib[iLocalityName].lower().title(),
             'code': lib[iLocalityCode]

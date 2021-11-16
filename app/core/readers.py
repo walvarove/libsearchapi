@@ -23,6 +23,7 @@ def get_provinces_from(list_with_duplicated_provinces):
 
     return res
 
+
 def get_localitites_from(list_with_duplicated_localities):
     res = []
     for locality in list_with_duplicated_localities:
@@ -31,77 +32,74 @@ def get_localitites_from(list_with_duplicated_localities):
 
     return res
 
-def get_library_from(state: str):
-    if state == 'cat':
+
+def get_library_from(ccaa: str):
+    if ccaa == 'cat':
         return get_catalan_libraries()
-    elif state == 'val':
+    elif ccaa == 'val':
         return get_valencian_librabries()
-    elif state == 'eus':
+    elif ccaa == 'eus':
         return get_eusaki_libraries()
     return []
 
 
 def get_eusaki_libraries():
+    res = []
     with open(eusPath, encoding='utf-8') as file:
         libraries = json.load(file)
-        res = []
         for lib in libraries:
             res.append(map_euskadi_library(lib))
     return res
 
 
 def get_catalan_libraries():
+    res = []
     with open(catPath, 'r', encoding='utf-8') as file:
         obj = xml_to_json(file.read())
         rows = obj['response']['row']
-        res = []
         for lib in rows:
             res.append(map_catalunya_library(lib))
     return res
 
 
 def get_valencian_librabries():
-    data = []
+    res = []
     with open(valPath, "r", encoding='utf-8') as infile:
         reader = csv.DictReader(infile)  # read rows into a dictionary format
         elems = reader.fieldnames[0].split(';')
         for row in reader:
             values = ';'.join(flatten_list(list(row.values()))).split(';')
-            data.append(map_valencian_library(values, elems))
-    return data
+            res.append(map_valencian_library(values, elems))
+    return res
 
 
-def search_by(states):
-    data = []
-    for state in states:
-        libs = get_library_from(state)
-        data = data + libs
-    return data
+def load_by(ccaa):
+    libraries: List[Library] = []
 
+    for ca in ccaa:
+        caLibs = get_library_from(ca)
+        libraries = libraries + caLibs
 
-def get_location_and_provinces():
-    return {"locations:": [], "provinces": []}
+    provinces = get_provinces_from(
+        list(map(lambda x: x['province'], libraries)))
 
+    localities = get_localitites_from(
+        list(map(lambda x: x['locality'], libraries)))
 
-def load_by(states):
-    libsData: List[Library] = []
-
-    for state in states:
-        libs = get_library_from(state)
-        libsData = libsData + libs
-
-    provinces_flat = get_provinces_from(
-        list(map(lambda x: x['province'], libsData)))
-    provinces = list(map(lambda x: Province(
-        name=x['name'], code=x['code']), provinces_flat))
-
-    # localities_flat = get_localitites_from(
-    #     list(map(lambda x: x['locality'], libsData)))
-    # localities = list(map(lambda province: Locality(
-    #     name=province.name, code=province.code, province=Province), provinces))
-
-    with Session() as session:
-        session.add_all(provinces)
-        session.add_all(localities)
-        session.commit()
-    return get_provinces_from(provinces)
+    for province in provinces:
+        localities_per_province = list(
+            filter(lambda x: x['code'][:2] == province['code'], localities))
+        province = Province(province['name'], province['code'])
+        with Session() as session:
+            session.add(province)
+            session.flush()
+            for locality in localities_per_province:
+                locality = Locality(
+                    locality['name'], locality['code'], province.id)
+                session.add(locality)
+                session.flush()
+                libraries_per_locality = list(map(lambda library: Library(library.get('name', None), library.get('type', None), library.get('address', None), library.get('postcalCode', None), library.get('longitude', None),
+                                                             library.get('latitude', None), library.get('email', None), library.get('phoneNumber', None), library.get('description', None), locality.id, province.id), libraries))
+                session.add_all(libraries_per_locality)
+                session.commit()
+    return libraries
