@@ -10,6 +10,9 @@ from app.core.mappings import all_libs
 from app.core.models.library import (Library, LibrarySchema,  # new
                                      Locality, Province)
 from app.core.readers import load_by
+from app.core.readers import get_library_from
+from app.core.readers import get_provinces_from
+from app.core.readers import get_localitites_from
 from app.db.crud import libraries_crud
 from app.db.session import Session, engine  # new
 
@@ -56,4 +59,11 @@ def search(db: Session = Depends(get_db)) -> List[LibrarySchema]:
 @app.get("/load", status_code=status.HTTP_204_NO_CONTENT)
 def load(ca: List[str] = Query(all_libs)):
     cas = ca
+    print('mera cabron: ', cas)
     return load_by(cas)
+
+@app.get("/test", status_code=status.HTTP_200_OK)
+async def test(ca : Optional[List[str]]= Query(None)):
+    que = {"recibido":ca}
+    return load_by(ca)
+    # return que

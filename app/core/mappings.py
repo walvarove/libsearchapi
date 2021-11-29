@@ -29,7 +29,7 @@ def map_catalunya_library(lib):
     return {
         'name': lib['nom'],
         'description': lib['alies'],
-        'postalCode': lib['cpostal'],
+        'postalCode': str(lib['cpostal']),
         'longitude': lib['longitud'],
         'latitude': lib['latitud'],
         'type': get_type_cat(str(lib['propietats'])),
@@ -39,7 +39,8 @@ def map_catalunya_library(lib):
         # 'web': lib['weburl'],
         'locality': {
             'name': lib['poblacio'],
-            'code': lib['codi_municipi']
+            'code': lib['codi_municipi'],
+            'cpostal': str(lib['cpostal'])[:2]
         },
         'province': {
             'name': get_provincia_cat(lib['cpostal']),
@@ -57,13 +58,14 @@ def map_euskadi_library(lib):
         'longitude': lib['latwgs84'],
         'latitude': lib['lonwgs84'],
         'type': 'PU',
-        'direccion': lib['address'],
+        'address': lib['address'],
         'email': lib['email'],
         'web': lib['webpage'],
         'phoneNumber':lib['phone'],
         'locality': {
             'name': lib['municipality'],
-            'code': postalCode[2:]
+            'code': postalCode[2:],
+            'cpostal': postalCode
         },
         'province': {
             'name': lib['territory'],
@@ -89,6 +91,8 @@ def map_valencian_library(lib, elems):
         'name': lib[iName],
         'description': lib[iDescription],
         'postalCode': lib[iPostalCode],
+        'longitude':'',
+        'latitude':'',
         'type': lib[iType],
         'address': lib[iAddress],
         'email': lib[iEmail],
@@ -96,7 +100,8 @@ def map_valencian_library(lib, elems):
         'phoneNumber':lib[iPhoneNumber][5:],
         'locality': {
             'name': lib[iLocalityName].lower().title(),
-            'code': lib[iLocalityCode]
+            'code': lib[iLocalityCode],
+            'cpostal':lib[iPostalCode]
         },
         'province': {
             'name': lib[iProvinceName].lower().title(),

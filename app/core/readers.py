@@ -2,6 +2,7 @@ import os
 import json
 import csv
 from typing import List
+from typing import Final
 
 from sqlalchemy.sql.expression import insert
 from app.core.mappings import map_catalunya_library, map_euskadi_library, map_valencian_library
@@ -13,6 +14,11 @@ from app.utils.utils import flatten_list, xml_to_json
 catPath = os.path.join(os.path.dirname(__file__), "../static/catalunya.xml")
 eusPath = os.path.join(os.path.dirname(__file__), "../static/euskadi.json")
 valPath = os.path.join(os.path.dirname(__file__), "../static/valenciana.csv")
+
+catPathDemo = os.path.join(os.path.dirname(__file__), "../static/cat-demo.xml")
+eusPathDemo = os.path.join(os.path.dirname(__file__), "../static/eus-demo.json")
+valPathDemo = os.path.join(os.path.dirname(__file__), "../static/val-demo.csv")
+
 
 
 def get_provinces_from(list_with_duplicated_provinces):
@@ -45,7 +51,7 @@ def get_library_from(ccaa: str):
 
 def get_eusaki_libraries():
     res = []
-    with open(eusPath, encoding='utf-8') as file:
+    with open(eusPathDemo, encoding='utf-8') as file:
         libraries = json.load(file)
         for lib in libraries:
             res.append(map_euskadi_library(lib))
@@ -54,7 +60,7 @@ def get_eusaki_libraries():
 
 def get_catalan_libraries():
     res = []
-    with open(catPath, 'r', encoding='utf-8') as file:
+    with open(catPathDemo, 'r', encoding='utf-8') as file:
         obj = xml_to_json(file.read())
         rows = obj['response']['row']
         for lib in rows:
@@ -64,7 +70,7 @@ def get_catalan_libraries():
 
 def get_valencian_librabries():
     res = []
-    with open(valPath, "r", encoding='utf-8') as infile:
+    with open(valPathDemo, "r", encoding='latin-1') as infile:
         reader = csv.DictReader(infile)  # read rows into a dictionary format
         elems = reader.fieldnames[0].split(';')
         for row in reader:
@@ -79,6 +85,7 @@ def load_by(ccaa):
     for ca in ccaa:
         caLibs = get_library_from(ca)
         libraries = libraries + caLibs
+    
 
     provinces = get_provinces_from(
         list(map(lambda x: x['province'], libraries)))
@@ -88,18 +95,23 @@ def load_by(ccaa):
 
     for province in provinces:
         localities_per_province = list(
-            filter(lambda x: x['code'][:2] == province['code'], localities))
+            filter(lambda x: x['cpostal'][:1] == province['code'][:1], localities))
         province = Province(province['name'], province['code'])
         with Session() as session:
             session.add(province)
             session.flush()
             for locality in localities_per_province:
-                locality = Locality(
-                    locality['name'], locality['code'], province.id)
-                session.add(locality)
+                loc_code = locality['code']
+                localityAux = Locality(
+                    locality['name'], locality['code'], province.id)    
+                prov_id = province.id    
+                session.add(localityAux)
                 session.flush()
-                libraries_per_locality = list(map(lambda library: Library(library.get('name', None), library.get('type', None), library.get('address', None), library.get('postcalCode', None), library.get('longitude', None),
-                                                             library.get('latitude', None), library.get('email', None), library.get('phoneNumber', None), library.get('description', None), locality.id, province.id), libraries))
-                session.add_all(libraries_per_locality)
+                libraries_per_locality = list(
+                    filter(lambda lib:lib['locality']['code'] == loc_code, libraries))
+                libs = []
+                for lib in libraries_per_locality:
+                    libs.append(Library(lib['name'],lib['type'],lib['address'],lib['postalCode'],lib['longitude'],lib['latitude'],lib['email'],lib['phoneNumber'],lib['description'],localityAux.id,prov_id))
+                session.add_all(libs)
                 session.commit()
     return libraries
