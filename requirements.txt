@@ -6,6 +6,8 @@ s3fs
 fsspec
 pydantic
 
+selenium
+
 #for database
 sqlalchemy
 psycopg2

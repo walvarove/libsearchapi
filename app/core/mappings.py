@@ -1,11 +1,17 @@
 from typing import Final
 import xmltodict
+from selenium import webdriver
 import json
 import csv
 import pandas as pd
+import time
 
 all_libs: Final = ['cat', 'val', 'eus']
 
+res = {
+    "long" : '',
+    "lat": '',
+}
 
 def get_type_cat(str: str):
     obj = ''.join(reversed(str)).split('|')
@@ -74,7 +80,7 @@ def map_euskadi_library(lib):
     }
 
 
-def map_valencian_library(lib, elems):
+def map_valencian_library(lib, elems,browser):
     iName = elems.index('NOMBRE')
     iDescription = elems.index('TIPO')
     iAddress = elems.index('DIRECCION')
@@ -87,12 +93,17 @@ def map_valencian_library(lib, elems):
     iLocalityCode = elems.index('COD_MUNICIPIO')
     iProvinceName = elems.index('NOM_PROVINCIA')
     iProvinceCode = elems.index('COD_PROVINCIA')
+    adrs = str(lib[iAddress])
+    adrs = f'{adrs} {lib[iPostalCode]}'
+    print('huelemelo cabron : ', adrs)
+        
+    res = runSearch(browser,adrs)
     return {
         'name': lib[iName],
         'description': lib[iDescription],
         'postalCode': lib[iPostalCode],
-        'longitude':'',
-        'latitude':'',
+        'longitude':res["long"],
+        'latitude':res["lat"],
         'type': lib[iType],
         'address': lib[iAddress],
         'email': lib[iEmail],
@@ -108,3 +119,29 @@ def map_valencian_library(lib, elems):
             'code': lib[iProvinceCode]
         }
     }
+
+def runSearch(browser,address):
+    # browser.execute_script("window.scrollTo(0,300)")
+    # browser.find_element_by_xpath('//*[@id="address"]').clear()
+    # browser.find_element_by_xpath('//*[@id="address"]').send_keys(address)
+    # browser.save_screenshot('screen.png')
+    # browser.find_element_by_xpath('//*[@id="wrap"]/div[2]/div[3]/div[1]/form[1]/div[2]/div/button').click()
+    # time.sleep(3)
+    # res1 = browser.find_element_by_xpath('//*[@id="longitude"]').get_attribute('value')
+    # res2 = browser.find_element_by_xpath('//*[@id="latitude"]').get_attribute('value')
+    
+    urladd = f'https://www.google.com/maps/place/{address}'
+    browser.get(urladd)
+    print('huele huele :',urladd)
+    time.sleep(5)
+    res = browser.current_url
+    res = str(res)
+    res = res.split('@')
+    res = res[1][:21]
+    res = res.split(',')
+    return {
+        "lat":res[0],
+        "long":res[1]
+    }
+
+ 
