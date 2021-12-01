@@ -5,11 +5,11 @@ from typing import List, Optional
 import pandas as pd
 from fastapi import Depends, FastAPI, Query, status
 
-from app.core.config import settings
-from app.core.mappings import all_libs
-from app.core.models.library import (Library, LibrarySchema,  # new
+from app.src.config import settings
+from app.src.mappers import all_libs
+from app.src.models.library import (Library, LibrarySchema,  # new
                                      Locality, Province)
-from app.core.readers import load_by
+from app.src.loaders import load_by
 from app.db.crud import libraries_crud
 from app.db.session import Session, engine  # new
 
@@ -53,7 +53,12 @@ def search(db: Session = Depends(get_db)) -> List[LibrarySchema]:
     return libraries_crud.get_libraries(db)
 
 
-@app.get("/load", status_code=status.HTTP_204_NO_CONTENT)
+@app.get("/load", status_code=status.HTTP_200_OK)
 def load(ca: List[str] = Query(all_libs)):
     cas = ca
     return load_by(cas)
+
+# @app.get("/test", status_code=status.HTTP_200_OK)
+# async def test(ca : Optional[List[str]]= Query(None)):
+#     return load_by(ca)
+#     # return que
