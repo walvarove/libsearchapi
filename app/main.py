@@ -56,5 +56,4 @@ def search(db: Session = Depends(get_db)) -> List[LibrarySchema]:
 @app.get("/load", status_code=status.HTTP_200_OK)
 def load(ca: List[str] = Query(all_libs)):
     cas = ca
-    print('mera cabron: ', cas)
     return load_by(cas)

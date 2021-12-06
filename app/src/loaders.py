@@ -21,13 +21,10 @@ def load_by(ccaa):
 
         libraries_per_province = list(filter(
             lambda library: library['postal_code'][:2] == province['code'], libraries))
-        print(len(libraries_per_province))
         localities_codes_from_libraries = list(
             map(lambda lib: lib['locality']['code'], libraries_per_province))
-        print(len(localities_codes_from_libraries))
         localities_per_province = list(
             filter(lambda locality: locality['code'] in localities_codes_from_libraries, localities))
-        print(len(localities_per_province))
         province = Province(province['name'], province['code'])
 
         with Session() as session:
@@ -41,7 +38,6 @@ def load_by(ccaa):
                 session.flush()
                 libraries_per_locality = list(
                     filter(lambda lib: lib['locality']['code'] == loc_code, libraries_per_province))
-                print(len(libraries_per_locality))
                 libs = []
                 for lib in libraries_per_locality:
                     libs.append(Library(lib['name'], lib['type'], lib['address'], lib['postal_code'], lib['longitude'],
