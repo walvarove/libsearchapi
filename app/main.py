@@ -22,8 +22,7 @@ def get_db():
     finally:
         db.close()
 
-
-def create_tables():  # new
+def delete_tables():
     with Session() as session:
         try: 
             session.query(Library).delete()
@@ -32,6 +31,9 @@ def create_tables():  # new
             session.commit()
         except: 
             session.rollback()
+
+def create_tables():  # new
+    delete_tables();
     Library.metadata.create_all(bind=engine)
     Locality.metadata.create_all(bind=engine)
     Province.metadata.create_all(bind=engine)
@@ -62,7 +64,12 @@ def search(db: Session = Depends(get_db)) -> List[LibrarySchema]:
     return libraries_crud.get_libraries(db)
 
 
-@app.get("/load", status_code=status.HTTP_200_OK)
+@app.post("/load", status_code=status.HTTP_200_OK)
 def load(ca: List[str] = Query(all_libs)):
     cas = ca
     return load_by(cas)
+
+@app.delete("/", status_code=status.HTTP_204_NO_CONTENT)
+def delete():
+    delete_tables()
+    pass
