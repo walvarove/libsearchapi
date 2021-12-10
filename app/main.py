@@ -1,7 +1,7 @@
 from collections import defaultdict
 from posix import EX_SOFTWARE
 from typing import List, Optional
-
+from fastapi.middleware.cors import CORSMiddleware
 import pandas as pd
 from fastapi import Depends, FastAPI, Query, status
 
@@ -44,9 +44,18 @@ def start_application():
     create_tables()  # new
     return app
 
+origins = ['*']
+
 
 app = start_application()
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/search", response_model=List[LibrarySchema])
 def search(db: Session = Depends(get_db)) -> List[LibrarySchema]:

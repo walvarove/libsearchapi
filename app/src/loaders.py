@@ -18,7 +18,6 @@ def load_by(ccaa):
         list(map(lambda x: x['locality'], libraries)))
 
     for province in provinces:
-
         libraries_per_province = list(filter(
             lambda library: library['postal_code'][:2] == province['code'], libraries))
         localities_codes_from_libraries = list(
