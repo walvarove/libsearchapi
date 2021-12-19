@@ -1,10 +1,34 @@
-from typing import Any, Optional
+from typing import Any, List, Optional
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Integer, String, Column
 from sqlalchemy.sql.schema import ForeignKey, UniqueConstraint
 from sqlalchemy.orm import relationship
 from pydantic import BaseModel
 Base = declarative_base()
+
+class State(Base):
+    __name__ = 'state'
+    __tablename__: str = 'state'
+    __table_args__ = (
+        UniqueConstraint(
+            'name', 'slug', name='state_name_slug_unique_constraint'),
+    )
+    id = Column(Integer, primary_key=True)
+    name = Column(String(100))
+    slug = Column(String(10))
+
+    name_slug = {
+        'eus': 'Euskadi',
+        'cat': 'Cataluña',
+        'val': 'Comunidad Valenciana'
+    }
+    
+    # Relationships
+    provinces = relationship("Province", back_populates="state")
+
+    def __init__(self, slug: str):
+        self.name = self.name_slug[slug]
+        self.slug = slug
 
 
 class Province(Base):
@@ -17,14 +41,17 @@ class Province(Base):
         UniqueConstraint(
             'name', 'code', name='province_name_code_unique_constraint'),
     )
-    # Relationships
-    localities = relationship("Locality", back_populates="province")
-    libraries = relationship("Library", back_populates="province")
 
-    def __init__(self, name: str, code: str):
+    state_id = Column(Integer, ForeignKey("state.id"))
+
+    # Relationships
+    state = relationship("State", back_populates="provinces")
+    localities = relationship("Locality", back_populates="province")
+
+    def __init__(self, name: str, code: str, state_id: int):
         self.name = name
         self.code = code
-
+        self.state_id = state_id
 
 class Locality(Base):
     __name__ = 'locality'
@@ -37,6 +64,7 @@ class Locality(Base):
     name = Column(String(100))
     code = Column(String(10))
     province_id = Column(Integer, ForeignKey("province.id"))
+    
     # Relationships
     province = relationship("Province", back_populates="localities")
     libraries = relationship("Library", back_populates="locality")
@@ -62,13 +90,11 @@ class Library(Base):
     phone_number = Column(String(255))
     description = Column(String(255))
     locality_id = Column(Integer, ForeignKey('locality.id'))
-    province_id = Column(Integer, ForeignKey('province.id'))
 
     # Relationships
     locality = relationship("Locality", back_populates="libraries")
-    province = relationship("Province", back_populates="libraries")
 
-    def __init__(self: str, name: str, typing: str, address: str, postal_code: str, longitude: str, latitude: str, email: str, phone_number: str, description: str, locality_id: int, province_id: int):
+    def __init__(self: str, name: str, typing: str, address: str, postal_code: str, longitude: str, latitude: str, email: str, phone_number: str, description: str, locality_id: int):
         self.name = name
         self.type = typing
         self.address = address
@@ -79,12 +105,22 @@ class Library(Base):
         self.phone_umber = phone_number
         self.description = description
         self.locality_id = locality_id
-        self.province_id = province_id
+
+
+
+class StateSchema(BaseModel):
+    id: int
+    name: str
+    slug: str
+    
+    class Config:  
+        orm_mode = True
 
 class LocalitySchema(BaseModel):
     id: int
     name: str
     code: str
+
     class Config:  
         orm_mode = True
 
@@ -92,6 +128,7 @@ class ProvinceSchema(BaseModel):
     id: int
     name: str
     code: str
+
     class Config:  
         orm_mode = True
 
@@ -106,7 +143,6 @@ class LibrarySchema(BaseModel):
     email: str
     phone_number: Optional[str]
     description: str
-    locality_id: Optional[int]
-    province_id: Optional[int]
+
     class Config:  
         orm_mode = True

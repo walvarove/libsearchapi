@@ -37,12 +37,12 @@ def get_localitites_from(list_with_duplicated_localities):
     return res
 
 
-def get_library_from(ccaa: str):
-    if ccaa == 'cat':
+def get_library_from(state_slug: str):
+    if state_slug == 'cat':
         return get_catalan_libraries()
-    elif ccaa == 'val':
+    elif state_slug == 'val':
         return get_valencian_librabries()
-    elif ccaa == 'eus':
+    elif state_slug == 'eus':
         return get_eusaki_libraries()
     return []
 

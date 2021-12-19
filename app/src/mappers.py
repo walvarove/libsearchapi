@@ -6,7 +6,7 @@ import csv
 import pandas as pd
 import time
 
-all_libs: Final = ['cat', 'val', 'eus']
+all_libs_slugs: Final = ['cat', 'val', 'eus']
 
 def get_type_cat(str: str):
     obj = ''.join(reversed(str)).split('|')
@@ -45,6 +45,10 @@ def map_catalunya_library(lib):
         'province': {
             'name': get_provincia_cat(lib['cpostal']),
             'code': str(lib['cpostal'])[0:2]
+        },
+        'state': {
+            'name': 'Cataluña',
+            'slug': 'cat'
         }
     }
 
@@ -68,7 +72,11 @@ def map_euskadi_library(lib):
         },
         'province': {
             'name': lib['territory'],
-            'code': postal_code[:2]
+            'code': postal_code[:2],
+        },
+        'state': {
+            'name': 'Euskadi',
+            'slug': 'eus'
         }
     }
 
@@ -88,7 +96,6 @@ def map_valencian_library(lib, elems,browser):
     i_province_code = elems.index('COD_PROVINCIA')
     adrs = str(lib[i_address])
     adrs = f'{adrs} {lib[i_postal_code]}'
-        
     lag_lng = get_lag_lang_from_browser(browser,adrs)
 
     return {
@@ -109,19 +116,14 @@ def map_valencian_library(lib, elems,browser):
         'province': {
             'name': lib[i_province_name].lower().title(),
             'code': lib[i_province_code].zfill(2)
+        },
+        'state': {
+            'name': 'Comunidad valenciana',
+            'slug': 'val'
         }
     }
 
 def get_lag_lang_from_browser(browser,address):
-    # browser.execute_script("window.scrollTo(0,300)")
-    # browser.find_element_by_xpath('//*[@id="address"]').clear()
-    # browser.find_element_by_xpath('//*[@id="address"]').send_keys(address)
-    # browser.save_screenshot('screen.png')
-    # browser.find_element_by_xpath('//*[@id="wrap"]/div[2]/div[3]/div[1]/form[1]/div[2]/div/button').click()
-    # time.sleep(3)
-    # res1 = browser.find_element_by_xpath('//*[@id="longitude"]').get_attribute('value')
-    # res2 = browser.find_element_by_xpath('//*[@id="latitude"]').get_attribute('value')
-    
     urladd = f'https://www.google.com/maps/place/{address}'
     browser.get(urladd)
     time.sleep(5)

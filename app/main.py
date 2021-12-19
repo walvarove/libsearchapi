@@ -6,12 +6,12 @@ import pandas as pd
 from fastapi import Depends, FastAPI, Query, status
 
 from app.src.config import settings
-from app.src.mappers import all_libs
-from app.src.models.library import (Library, LibrarySchema,  # new
-                                     Locality, Province)
+from app.src.mappers import all_libs_slugs
+from app.src.models import (Library, LibrarySchema, 
+                                     Locality, Province, State)
 from app.src.loaders import load_by
 from app.db.crud import libraries_crud
-from app.db.session import Session, engine  # new
+from app.db.session import Session, engine
 
 
 # Dependency
@@ -28,6 +28,7 @@ def delete_tables():
             session.query(Library).delete()
             session.query(Locality).delete()
             session.query(Province).delete()
+            session.query(State).delete()
             session.commit()
         except: 
             session.rollback()
@@ -37,6 +38,7 @@ def create_tables():  # new
     Library.metadata.create_all(bind=engine)
     Locality.metadata.create_all(bind=engine)
     Province.metadata.create_all(bind=engine)
+    State.metadata.create_all(bind=engine)
 
 
 def start_application():
@@ -60,14 +62,15 @@ app.add_middleware(
 )
 
 @app.get("/search", response_model=List[LibrarySchema])
-def search(db: Session = Depends(get_db)) -> List[LibrarySchema]:
-    return libraries_crud.get_libraries(db)
+def search(state: List[str] = Query(all_libs_slugs), db: Session = Depends(get_db)) -> List[LibrarySchema]:
+    states = state
+    return libraries_crud.get_libraries(db, states)
 
 
 @app.post("/load", status_code=status.HTTP_200_OK)
-def load(ca: List[str] = Query(all_libs)):
-    cas = ca
-    return load_by(cas)
+def load(state: List[str] = Query(all_libs_slugs)):
+    states = state
+    return load_by(states)
 
 @app.delete("/", status_code=status.HTTP_204_NO_CONTENT)
 def delete():
