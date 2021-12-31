@@ -9,7 +9,7 @@ class Settings:
     POSTGRES_USER : str = 'practicasiei'
     POSTGRES_PASSWORD = 'practicasiei'
     POSTGRES_HOST : str = 'db'
-    POSTGRES_PORT : str = 5432 
+    POSTGRES_PORT : str = '5432' 
     POSTGRES_DB : str = 'practicasiei'
     DATABASE_URL = f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}"
 

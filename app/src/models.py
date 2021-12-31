@@ -60,6 +60,7 @@ class Locality(Base):
         UniqueConstraint(
             'name', 'code', name='locality_name_code_unique_constraint'),
     )
+
     id = Column(Integer, primary_key=True)
     name = Column(String(100))
     code = Column(String(10))
@@ -107,15 +108,6 @@ class Library(Base):
         self.locality_id = locality_id
 
 
-
-class StateSchema(BaseModel):
-    id: int
-    name: str
-    slug: str
-    
-    class Config:  
-        orm_mode = True
-
 class LocalitySchema(BaseModel):
     id: int
     name: str
@@ -128,6 +120,7 @@ class ProvinceSchema(BaseModel):
     id: int
     name: str
     code: str
+    localities: List[LocalitySchema]
 
     class Config:  
         orm_mode = True
@@ -143,6 +136,15 @@ class LibrarySchema(BaseModel):
     email: str
     phone_number: Optional[str]
     description: str
+
+    class Config:  
+        orm_mode = True
+
+class StateSchema(BaseModel):
+    id: int
+    name: str
+    slug: str
+    provinces: List[ProvinceSchema]
 
     class Config:  
         orm_mode = True
