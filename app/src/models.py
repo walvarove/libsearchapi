@@ -3,6 +3,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Integer, String, Column
 from sqlalchemy.sql.schema import ForeignKey, UniqueConstraint
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql.sqltypes import Enum
 from pydantic import BaseModel
 Base = declarative_base()
 
@@ -75,6 +76,9 @@ class Locality(Base):
         self.code = code
         self.province_id = province_id
 
+class LibraryType(str, Enum):
+    PUBLIC = 'PU'
+    PRIVATE = 'PR'
 
 class Library(Base):
     __name__ = 'locality'
@@ -82,7 +86,7 @@ class Library(Base):
     __tablename__: str = 'library'
     id = Column(Integer, primary_key=True)
     name = Column(String(255))
-    type = Column(String(255))
+    type: LibraryType = Column(String(255))
     address = Column(String(255))
     postal_code = Column(String(255))
     longitude = Column(String(255))
@@ -95,9 +99,9 @@ class Library(Base):
     # Relationships
     locality = relationship("Locality", back_populates="libraries")
 
-    def __init__(self: str, name: str, typing: str, address: str, postal_code: str, longitude: str, latitude: str, email: str, phone_number: str, description: str, locality_id: int):
+    def __init__(self: str, name: str, type: LibraryType, address: str, postal_code: str, longitude: str, latitude: str, email: str, phone_number: str, description: str, locality_id: int):
         self.name = name
-        self.type = typing
+        self.type = type
         self.address = address
         self.postal_code = postal_code
         self.longitude = longitude
@@ -128,7 +132,7 @@ class ProvinceSchema(BaseModel):
 class LibrarySchema(BaseModel):
     id: int
     name: str
-    type: str
+    type: LibraryType
     address: Optional[str]
     postal_code: Optional[str]
     longitude: Optional[str]

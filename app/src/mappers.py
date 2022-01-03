@@ -1,16 +1,18 @@
-from typing import Final
-import xmltodict
-from selenium import webdriver
-import json
 import csv
-import pandas as pd
+import json
 import time
+from typing import Final
+
+import pandas as pd
+import xmltodict
+from app.src.models import LibraryType
+from selenium import webdriver
 
 all_libs_slugs: Final = ['cat', 'val', 'eus']
 
-def get_type_cat(str: str):
-    obj = ''.join(reversed(str)).split('|')
-    return ''.join(reversed(obj[0]))
+
+def get_type_cat(category: str):
+    return LibraryType.PUBLIC if 'Públiques' in category else LibraryType.PRIVATE
 
 
 def get_provincia_cat(str: str):
@@ -33,7 +35,7 @@ def map_catalunya_library(lib):
         'postal_code': str(lib['cpostal']),
         'longitude': lib['longitud'],
         'latitude': lib['latitud'],
-        'type': get_type_cat(str(lib['propietats'])),
+        'type': get_type_cat(lib['categoria']),
         'address': lib['via'],
         'email': lib['email'],
         'phone_number': lib['telefon1'] if 'telefon1' in lib else None,
@@ -61,11 +63,11 @@ def map_euskadi_library(lib):
         'postal_code': postal_code,
         'longitude': lib['lonwgs84'],
         'latitude': lib['latwgs84'],
-        'type': 'PU',
+        'type': LibraryType.PUBLIC,
         'address': lib['address'],
         'email': lib['email'],
         'web': lib['webpage'],
-        'phone_number':lib['phone'],
+        'phone_number': lib['phone'],
         'locality': {
             'name': lib['municipality'],
             'code': postal_code[2:]
@@ -81,7 +83,7 @@ def map_euskadi_library(lib):
     }
 
 
-def map_valencian_library(lib, elems,browser):
+def map_valencian_library(lib, elems, browser):
     i_name = elems.index('NOMBRE')
     i_description = elems.index('TIPO')
     i_address = elems.index('DIRECCION')
@@ -96,19 +98,19 @@ def map_valencian_library(lib, elems,browser):
     i_province_code = elems.index('COD_PROVINCIA')
     adrs = str(lib[i_address])
     adrs = f'{adrs} {lib[i_postal_code]}'
-    lag_lng = get_lag_lang_from_browser(browser,adrs)
+    lag_lng = get_lag_lang_from_browser(browser, adrs)
 
     return {
         'name': lib[i_name],
         'description': lib[i_description],
         'postal_code': lib[i_postal_code].zfill(5),
-        'longitude':lag_lng["long"],
-        'latitude':lag_lng["lat"],
+        'longitude': lag_lng["long"],
+        'latitude': lag_lng["lat"],
         'type': lib[i_type],
         'address': lib[i_address],
         'email': lib[i_email],
         'web': lib[i_web],
-        'phone_number':lib[i_phone_number][5:],
+        'phone_number': lib[i_phone_number][5:],
         'locality': {
             'name': lib[i_locality_name].lower().title(),
             'code': lib[i_locality_code],
@@ -123,7 +125,8 @@ def map_valencian_library(lib, elems,browser):
         }
     }
 
-def get_lag_lang_from_browser(browser,address):
+
+def get_lag_lang_from_browser(browser, address):
     urladd = f'https://www.google.com/maps/place/{address}'
     browser.get(urladd)
     time.sleep(5)
@@ -133,8 +136,6 @@ def get_lag_lang_from_browser(browser,address):
     res = res[1][:21]
     res = res.split(',')
     return {
-        "lat":res[0],
-        "long":res[1]
+        "lat": res[0],
+        "long": res[1]
     }
-
- 

@@ -3,11 +3,11 @@ from posix import EX_SOFTWARE
 from typing import List, Optional
 from fastapi.middleware.cors import CORSMiddleware
 import pandas as pd
-from fastapi import Depends, FastAPI, Query, status
+from fastapi import Depends, FastAPI, Query, status, HTTPException
 
 from app.src.config import settings
 from app.src.mappers import all_libs_slugs
-from app.src.models import (Library, LibrarySchema,
+from app.src.models import (Library, LibrarySchema, LibraryType,
                             Locality, Province, State, StateSchema)
 from app.src.loaders import load_by
 from app.db.crud import libraries_crud
@@ -80,9 +80,17 @@ app.add_middleware(
 )
 
 
+@app.get("/libraries/{id}", response_model=LibrarySchema)
+def library(id: int, db: Session = Depends(get_db)) -> Optional[LibrarySchema]:
+    res = libraries_crud.get_library(db, id)
+    if res:
+        return res
+    else:
+        raise HTTPException(status_code=404, detail="Library not found")
+
 @app.get("/libraries", response_model=List[LibrarySchema])
-def libraries(locality_id: Optional[List[int]] = Query([]), province_id: Optional[List[int]] = Query([]), state_id: Optional[List[int]] = Query([]), db: Session = Depends(get_db)) -> Optional[List[LibrarySchema]]:
-    return libraries_crud.get_libraries(db, province_id, locality_id, state_id)
+def libraries(locality_id: Optional[List[int]] = Query([]), province_id: Optional[List[int]] = Query([]), state_id: Optional[List[int]] = Query([]), type: Optional[List[LibraryType]] = Query([]),db: Session = Depends(get_db)) -> Optional[List[LibrarySchema]]:
+    return libraries_crud.get_libraries(db, province_id, locality_id, state_id, type)
 
 
 @app.get("/locations", response_model=List[StateSchema])
