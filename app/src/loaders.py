@@ -6,7 +6,8 @@ from app.db.crud import libraries_crud
 
 def load_by(states_slugs):
     libraries: List[Library] = []
-
+    state_ids = []
+    
     for state_slug in states_slugs:
         caLibs = get_library_from(state_slug)
         libraries = libraries + caLibs
@@ -18,6 +19,7 @@ def load_by(states_slugs):
             state = State(state_slug)
             session.add(state)
             session.flush()
+            state_ids.append(state.id)
 
             provinces = get_provinces_from(
                 list(map(lambda x: x['province'], list(filter(lambda x: x['state']['slug'] == state_slug,libraries)))))
@@ -51,4 +53,4 @@ def load_by(states_slugs):
                                     lib['latitude'], lib['email'], lib['phone_number'], lib['description'], locality.id))
                     session.add_all(libs)
         session.commit()
-    return libraries_crud.get_libraries(session, [], [], [])
+    return libraries_crud.get_libraries(session, [], [], state_ids)
