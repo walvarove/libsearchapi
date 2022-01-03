@@ -1,9 +1,9 @@
-from typing import List
+from typing import List, Optional
 from sqlalchemy.orm import Session, joinedload
 from app.src.models import Library, Locality, Province, State
 
 
-def get_libraries(db: Session, province_ids: List[int], locality_ids: List[int], states_ids: List[int]):
+def get_libraries(db: Session, province_ids: Optional[List[int]] = [], locality_ids: Optional[List[int]] = [], states_ids: Optional[List[int]] = []):
 
     print(locality_ids)
 

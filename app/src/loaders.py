@@ -51,4 +51,4 @@ def load_by(states_slugs):
                                     lib['latitude'], lib['email'], lib['phone_number'], lib['description'], locality.id))
                     session.add_all(libs)
         session.commit()
-    return libraries_crud.get_libraries(session)
+    return libraries_crud.get_libraries(session, [], [], [])
