@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   
-  api_rest:
+  restapi:
         build: nginx
         ports:
           - 80:80
