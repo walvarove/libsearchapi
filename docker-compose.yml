@@ -11,7 +11,7 @@ services:
           
   api:
     build: .
-    command: gunicorn app.main:app --workers 8 --threads 8 -t 120 --bind 0.0.0.0:8000
+    command: gunicorn app.main:app --workers 8 --threads 8 -t 300 -k uvicorn.workers.UvicornWorker --bind "0.0.0.0:8000"
     ports:
       - 8000:8000
     environment:
