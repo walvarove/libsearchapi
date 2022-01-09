@@ -1,14 +1,14 @@
 version: '3.8'
 services:
   
-  api:
+  api_rest:
         build: nginx
         ports:
           - 80:80
         depends_on:
-          - api_server
-
-  api_server:
+          - api
+          
+  api:
     build: .
     command: uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
     ports:
