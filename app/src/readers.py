@@ -80,6 +80,7 @@ def get_valencian_librabries():
 
 def runBrowser():
     chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_argument("--disable-web-security") 
     chrome_options.add_argument('--disable-dev-shm-usage') 
     chrome_options.add_argument('--no-sandbox')
     chrome_options.add_argument('--window-size=1420,1080')

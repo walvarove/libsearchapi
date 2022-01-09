@@ -6,7 +6,6 @@ from typing import Final
 import pandas as pd
 import xmltodict
 from app.src.models import LibraryType
-from selenium import webdriver
 
 all_libs_slugs: Final = ['cat', 'val', 'eus']
 
