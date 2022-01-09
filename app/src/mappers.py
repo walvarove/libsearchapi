@@ -72,7 +72,7 @@ def map_euskadi_library(lib):
         'phone_number': lib['phone'],
         'locality': {
             'name': lib['municipality'],
-            'code': postal_code[2:]
+            'code': postal_code
         },
         'province': {
             'name': lib['territory'],
@@ -131,10 +131,9 @@ def map_valencian_library(lib, elems, browser):
 def get_lag_lang_from_browser(browser, address):
     urladd = f'https://www.google.com/maps/search/{address}'
     browser.get(urladd)
+    
     wait = WebDriverWait(browser, 10)
-
-    wait.until(
-            lambda driver: '@' in driver.current_url)
+    wait.until(lambda driver: '@' in driver.current_url)
         
 
     res = browser.current_url
