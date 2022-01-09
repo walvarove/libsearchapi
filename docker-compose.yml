@@ -34,5 +34,17 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data/
 
+  pgadmin:
+      image: dpage/pgadmin4
+      container_name: pgadmin-container
+      depends_on:
+        - db
+      ports:
+        - 5051:80
+      environment:
+        PGADMIN_DEFAULT_EMAIL: practicas@iei.com
+        PGADMIN_DEFAULT_PASSWORD: practicasiei
+      restart: always
+
 volumes:
   postgres_data:

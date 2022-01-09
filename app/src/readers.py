@@ -3,7 +3,7 @@ import json
 import csv
 from typing import List
 from typing import Final
-
+from selenium.common.exceptions import NoSuchElementException
 from selenium import webdriver
 from app.src.mappers import map_catalunya_library, map_euskadi_library, map_valencian_library
 from app.utils.utils import flatten_list, xml_to_json
@@ -88,6 +88,10 @@ def runBrowser():
     chrome_options.add_argument('--disable-gpu')
     browser = webdriver.Chrome(chrome_options=chrome_options)
     browser.get('https://www.google.com/maps')
-    browser.find_element_by_xpath('//*[@id="yDmH0d"]/c-wiz/div/div/div/div[2]/div[1]/div[4]/form').click()
+    try:
+        accept_cookies_button = browser.find_element_by_xpath('//*[@id="yDmH0d"]/c-wiz/div/div/div/div[2]/div[1]/div[4]/form/div[1]/div/button')
+        accept_cookies_button.click()
+    except NoSuchElementException:
+        return browser
     return browser
 
