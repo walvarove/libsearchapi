@@ -88,6 +88,6 @@ def runBrowser():
     chrome_options.add_argument('--disable-gpu')
     browser = webdriver.Chrome(chrome_options=chrome_options)
     browser.get('https://www.google.com/maps')
-    browser.find_element_by_xpath('//*[@id="XmI62e"]/c-wiz/div/div/div/div[2]/div[1]/div[4]/form').click()
+    browser.find_element_by_xpath('//*[@id="yDmH0d"]/c-wiz/div/div/div/div[2]/div[1]/div[4]/form').click()
     return browser
 
