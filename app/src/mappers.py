@@ -6,6 +6,9 @@ from typing import Final
 import pandas as pd
 import xmltodict
 from app.src.models import LibraryType
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 all_libs_slugs: Final = ['cat', 'val', 'eus']
 
@@ -126,15 +129,23 @@ def map_valencian_library(lib, elems, browser):
 
 
 def get_lag_lang_from_browser(browser, address):
-    urladd = f'https://www.google.com/maps/place/{address}'
+    urladd = f'https://www.google.com/maps/search/{address}'
     browser.get(urladd)
-    time.sleep(5)
+    wait = WebDriverWait(browser, 10)
+
+    wait.until(
+            lambda driver: '@' in driver.current_url)
+        
+
     res = browser.current_url
     res = str(res)
     res = res.split('@')
     res = res[1][:21]
     res = res.split(',')
+
+
     return {
         "lat": res[0],
         "long": res[1]
     }
+
