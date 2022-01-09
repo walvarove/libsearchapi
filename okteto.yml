@@ -1,0 +1,15 @@
+name: api
+command: bash
+sync:
+- .:/code
+forward:
+- 8000:8000
+- 8080:80
+reverse:
+- 9000:9000
+volumes:
+- /root/.cache/pip
+
+timeout:
+  default: 3m
+  resources: 5m
